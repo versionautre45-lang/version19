@@ -13,6 +13,8 @@ export interface InternDTO {
   endDate: string;
   status: string;
   encadreurId: number;
+  encadreurNom?: string;
+  encadreurPrenom?: string;
   projectId: number | null;
   cv: string | null;
   notes: string | null;

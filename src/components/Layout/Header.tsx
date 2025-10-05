@@ -9,7 +9,7 @@ interface HeaderProps {
   onNavigate?: (section: string) => void;
 }
 
-export default function Header({ onNavigate }: HeaderProps = {}) {
+export default function Header({ onNavigate }: HeaderProps) {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [showProfile, setShowProfile] = useState(false);

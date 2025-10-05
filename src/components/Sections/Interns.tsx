@@ -3,6 +3,7 @@ import { Users, Plus, Search, MoreVertical } from 'lucide-react';
 import InternDetailModal from '../Modals/InternDetailModal';
 import InternFormModal from '../Modals/InternFormModal';
 import { internService, InternDTO } from '../../services/internService';
+import { encadreurService } from '../../services/encadreurService';
 import { useApiError } from '../../hooks/useApiError';
 
 export default function Interns() {
@@ -10,6 +11,7 @@ export default function Interns() {
   const [selectedIntern, setSelectedIntern] = useState<InternDTO | null>(null);
   const [showInternDetail, setShowInternDetail] = useState(false);
   const [showInternForm, setShowInternForm] = useState(false);
+  const [showEditForm, setShowEditForm] = useState(false);
   const [filterDepartment, setFilterDepartment] = useState('');
   const [interns, setInterns] = useState<InternDTO[]>([]);
   const [loading, setLoading] = useState(true);
@@ -22,8 +24,21 @@ export default function Interns() {
   const loadInterns = async () => {
     try {
       setLoading(true);
-      const data = await internService.getAllInterns();
-      setInterns(data);
+      const [internsData, encadreursData] = await Promise.all([
+        internService.getAllInterns(),
+        encadreurService.getAllEncadreurs()
+      ]);
+
+      const internsWithEncadreur = internsData.map(intern => {
+        const encadreur = encadreursData.find(e => e.id === intern.encadreurId);
+        return {
+          ...intern,
+          encadreurNom: encadreur?.nom,
+          encadreurPrenom: encadreur?.prenom
+        };
+      });
+
+      setInterns(internsWithEncadreur);
     } catch (error: any) {
       handleApiError(error, 'Erreur lors du chargement des stagiaires');
     } finally {
@@ -174,6 +189,15 @@ export default function Interns() {
                   </div>
 
                   <div className="flex justify-between text-sm">
+                    <span className="text-gray-600 dark:text-gray-300">Encadreur</span>
+                    <span className="font-medium text-gray-900 dark:text-white">
+                      {intern.encadreurPrenom && intern.encadreurNom
+                        ? `${intern.encadreurPrenom} ${intern.encadreurNom}`
+                        : 'Non assigné'}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between text-sm">
                     <span className="text-gray-600 dark:text-gray-300">Date de début</span>
                     <span className="font-medium text-gray-900 dark:text-white">{new Date(intern.startDate).toLocaleDateString()}</span>
                   </div>
@@ -206,6 +230,7 @@ export default function Interns() {
           setShowInternDetail(false);
           setSelectedIntern(null);
         }}
+        onUpdate={loadInterns}
       />
 
       {/* Intern Form Modal */}
