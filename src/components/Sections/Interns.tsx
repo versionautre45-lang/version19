@@ -5,6 +5,7 @@ import InternFormModal from '../Modals/InternFormModal';
 import { internService, InternDTO } from '../../services/internService';
 import { encadreurService } from '../../services/encadreurService';
 import { useApiError } from '../../hooks/useApiError';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function Interns() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -16,18 +17,31 @@ export default function Interns() {
   const [interns, setInterns] = useState<InternDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const handleApiError = useApiError();
+  const { authUser } = useAuth();
 
   useEffect(() => {
     loadInterns();
-  }, []);
+  }, [authUser]);
 
   const loadInterns = async () => {
     try {
       setLoading(true);
-      const [internsData, encadreursData] = await Promise.all([
-        internService.getAllInterns(),
-        encadreurService.getAllEncadreurs()
-      ]);
+
+      let internsData: InternDTO[];
+
+      if (authUser?.role === 'ENCADREUR') {
+        const storedUser = localStorage.getItem('auth_user');
+        if (storedUser) {
+          const userData = JSON.parse(storedUser);
+          internsData = await internService.getAllInterns({ encadreurUserId: userData.id });
+        } else {
+          internsData = [];
+        }
+      } else {
+        internsData = await internService.getAllInterns();
+      }
+
+      const encadreursData = await encadreurService.getAllEncadreurs();
 
       const internsWithEncadreur = internsData.map(intern => {
         const encadreur = encadreursData.find(e => e.id === intern.encadreurId);
@@ -100,13 +114,15 @@ export default function Interns() {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Stagiaires</h2>
           <p className="text-gray-600 dark:text-gray-300 mt-1">Gérer et suivre vos stagiaires</p>
         </div>
-        <button
-          onClick={() => setShowInternForm(true)}
-          className="mt-4 sm:mt-0 bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-2 rounded-lg hover:from-orange-600 hover:to-red-600 transition-all duration-200 flex items-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105"
-        >
-          <Plus className="h-4 w-4" />
-          <span>Ajouter un stagiaire</span>
-        </button>
+        {(authUser?.role === 'ADMIN' || authUser?.role === 'ENCADREUR') && (
+          <button
+            onClick={() => setShowInternForm(true)}
+            className="mt-4 sm:mt-0 bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-2 rounded-lg hover:from-orange-600 hover:to-red-600 transition-all duration-200 flex items-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Ajouter un stagiaire</span>
+          </button>
+        )}
       </div>
 
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 md:p-6">

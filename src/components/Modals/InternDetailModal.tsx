@@ -3,6 +3,7 @@ import { X, Calendar, Mail, Building, TrendingUp, Award, GraduationCap, Phone, U
 import { InternDTO, internService, UpdateInternRequest } from '../../services/internService';
 import { encadreurService } from '../../services/encadreurService';
 import { useApiError } from '../../hooks/useApiError';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface InternDetailModalProps {
   intern: InternDTO | null;
@@ -17,6 +18,7 @@ export default function InternDetailModal({ intern, isOpen, onClose, onUpdate }:
   const [encadreurs, setEncadreurs] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const handleApiError = useApiError();
+  const { authUser } = useAuth();
 
   React.useEffect(() => {
     if (isOpen && isEditing) {
@@ -37,7 +39,19 @@ export default function InternDetailModal({ intern, isOpen, onClose, onUpdate }:
   const loadEncadreurs = async () => {
     try {
       const data = await encadreurService.getAllEncadreurs();
-      setEncadreurs(data);
+
+      if (authUser?.role === 'ENCADREUR') {
+        const storedUser = localStorage.getItem('auth_user');
+        if (storedUser) {
+          const userData = JSON.parse(storedUser);
+          const currentEncadreur = data.find(e => e.userId === userData.id);
+          if (currentEncadreur) {
+            setEncadreurs([currentEncadreur]);
+          }
+        }
+      } else {
+        setEncadreurs(data);
+      }
     } catch (error: any) {
       handleApiError(error, 'Erreur lors du chargement des encadreurs');
     }
@@ -295,13 +309,15 @@ export default function InternDetailModal({ intern, isOpen, onClose, onUpdate }:
                 >
                   Fermer
                 </button>
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg hover:from-orange-600 hover:to-red-600 transition-all duration-200 flex items-center gap-2"
-                >
-                  <Edit2 className="h-4 w-4" />
-                  Modifier le stagiaire
-                </button>
+                {(authUser?.role === 'ADMIN' || authUser?.role === 'ENCADREUR') && (
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg hover:from-orange-600 hover:to-red-600 transition-all duration-200 flex items-center gap-2"
+                  >
+                    <Edit2 className="h-4 w-4" />
+                    Modifier le stagiaire
+                  </button>
+                )}
               </>
             ) : (
               <>

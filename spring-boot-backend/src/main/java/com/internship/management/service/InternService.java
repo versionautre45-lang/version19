@@ -81,6 +81,15 @@ public class InternService {
     }
 
     @Transactional(readOnly = true)
+    public List<InternDTO> getInternsByEncadreurUserId(Long userId) {
+        Encadreur encadreur = encadreurRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("ENCADREUR_NOT_FOUND"));
+        return internRepository.findByEncadreurId(encadreur.getId()).stream()
+                .map(InternDTO::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
     public List<InternDTO> getInternsByDepartment(String department) {
         return internRepository.findAll().stream()
                 .filter(intern -> intern.getUser().getDepartment() != null &&

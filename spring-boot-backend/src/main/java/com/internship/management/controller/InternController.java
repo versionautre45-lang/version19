@@ -34,11 +34,15 @@ public class InternController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<InternDTO>>> getAllInterns(
             @RequestParam(required = false) Long encadreurId,
+            @RequestParam(required = false) Long encadreurUserId,
             @RequestParam(required = false) String department,
             @RequestParam(required = false) String status
     ) {
         if (encadreurId != null) {
             return ResponseEntity.ok(ApiResponse.success("INTERN_LIST_BY_ENCADREUR", internService.getInternsByEncadreur(encadreurId)));
+        }
+        if (encadreurUserId != null) {
+            return ResponseEntity.ok(ApiResponse.success("INTERN_LIST_BY_ENCADREUR_USER", internService.getInternsByEncadreurUserId(encadreurUserId)));
         }
         if (department != null) {
             return ResponseEntity.ok(ApiResponse.success("INTERN_LIST_BY_DEPARTMENT", internService.getInternsByDepartment(department)));

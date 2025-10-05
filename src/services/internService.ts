@@ -46,9 +46,10 @@ export interface UpdateInternStatusRequest {
 }
 
 export const internService = {
-  async getAllInterns(params?: { encadreurId?: number; department?: string; status?: string }): Promise<InternDTO[]> {
+  async getAllInterns(params?: { encadreurId?: number; encadreurUserId?: number; department?: string; status?: string }): Promise<InternDTO[]> {
     const query = new URLSearchParams();
     if (params?.encadreurId) query.append('encadreurId', params.encadreurId.toString());
+    if (params?.encadreurUserId) query.append('encadreurUserId', params.encadreurUserId.toString());
     if (params?.department) query.append('department', params.department);
     if (params?.status) query.append('status', params.status);
 

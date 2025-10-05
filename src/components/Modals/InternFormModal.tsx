@@ -3,6 +3,7 @@ import { X, User, Mail, Building, Calendar, GraduationCap, BookOpen } from 'luci
 import { authService } from '../../services/authService';
 import { encadreurService } from '../../services/encadreurService';
 import { useApiError } from '../../hooks/useApiError';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface InternFormModalProps {
   isOpen: boolean;
@@ -26,6 +27,7 @@ export default function InternFormModal({ isOpen, onClose, onSubmit }: InternFor
   const [encadreurs, setEncadreurs] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const handleApiError = useApiError();
+  const { authUser } = useAuth();
 
   useEffect(() => {
     if (isOpen) {
@@ -36,7 +38,20 @@ export default function InternFormModal({ isOpen, onClose, onSubmit }: InternFor
   const loadEncadreurs = async () => {
     try {
       const data = await encadreurService.getAllEncadreurs();
-      setEncadreurs(data);
+
+      if (authUser?.role === 'ENCADREUR') {
+        const storedUser = localStorage.getItem('auth_user');
+        if (storedUser) {
+          const userData = JSON.parse(storedUser);
+          const currentEncadreur = data.find(e => e.userId === userData.id);
+          if (currentEncadreur) {
+            setEncadreurs([currentEncadreur]);
+            setFormData(prev => ({ ...prev, encadreurId: currentEncadreur.id }));
+          }
+        }
+      } else {
+        setEncadreurs(data);
+      }
     } catch (error: any) {
       handleApiError(error, 'Erreur lors du chargement des encadreurs');
     }
