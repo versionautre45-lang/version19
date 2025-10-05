@@ -1,5 +1,24 @@
 import { apiService } from './api';
 
+interface InternDTOBackend {
+  id: number;
+  userId: number;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  school: string;
+  department: string;
+  startDate: string;
+  endDate: string;
+  status: string;
+  encadreurId: number;
+  encadreurName?: string;
+  projectId: number | null;
+  cv: string | null;
+  notes: string | null;
+}
+
 export interface InternDTO {
   id: number;
   userId: number;
@@ -18,6 +37,26 @@ export interface InternDTO {
   projectId: number | null;
   cv: string | null;
   notes: string | null;
+}
+
+function mapBackendToFrontend(backend: InternDTOBackend): InternDTO {
+  return {
+    id: backend.id,
+    userId: backend.userId,
+    email: backend.email,
+    nom: backend.lastName,
+    prenom: backend.firstName,
+    phone: backend.phone,
+    school: backend.school,
+    department: backend.department,
+    startDate: backend.startDate,
+    endDate: backend.endDate,
+    status: backend.status,
+    encadreurId: backend.encadreurId,
+    projectId: backend.projectId,
+    cv: backend.cv,
+    notes: backend.notes,
+  };
 }
 
 export interface CreateInternRequest {
@@ -54,23 +93,28 @@ export const internService = {
     if (params?.status) query.append('status', params.status);
 
     const queryString = query.toString() ? `?${query.toString()}` : '';
-    return apiService.get<InternDTO[]>(`/interns${queryString}`);
+    const backendData = await apiService.get<InternDTOBackend[]>(`/interns${queryString}`);
+    return backendData.map(mapBackendToFrontend);
   },
 
   async getInternById(id: number): Promise<InternDTO> {
-    return apiService.get<InternDTO>(`/interns/${id}`);
+    const backendData = await apiService.get<InternDTOBackend>(`/interns/${id}`);
+    return mapBackendToFrontend(backendData);
   },
 
   async createIntern(request: CreateInternRequest): Promise<InternDTO> {
-    return apiService.post<InternDTO>('/interns', request);
+    const backendData = await apiService.post<InternDTOBackend>('/interns', request);
+    return mapBackendToFrontend(backendData);
   },
 
   async updateIntern(id: number, request: UpdateInternRequest): Promise<InternDTO> {
-    return apiService.put<InternDTO>(`/interns/${id}`, request);
+    const backendData = await apiService.put<InternDTOBackend>(`/interns/${id}`, request);
+    return mapBackendToFrontend(backendData);
   },
 
   async updateInternStatus(id: number, status: UpdateInternStatusRequest): Promise<InternDTO> {
-    return apiService.patch<InternDTO>(`/interns/${id}/status`, status);
+    const backendData = await apiService.patch<InternDTOBackend>(`/interns/${id}/status`, status);
+    return mapBackendToFrontend(backendData);
   },
 
   async deleteIntern(id: number): Promise<void> {

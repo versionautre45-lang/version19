@@ -55,7 +55,7 @@ public class EncadreurService {
     public List<InternDTO> getEncadreurInterns(Long encadreurId) {
         List<Intern> interns = internRepository.findByEncadreurId(encadreurId);
         return interns.stream()
-                .map(this::convertInternToDTO)
+                .map(InternDTO::fromEntity)
                 .collect(Collectors.toList());
     }
 
@@ -174,16 +174,4 @@ public class EncadreurService {
                 .build();
     }
 
-    private InternDTO convertInternToDTO(Intern intern) {
-        return InternDTO.builder()
-                .id(intern.getId())
-                .userId(intern.getUser().getId())
-                .encadreurId(intern.getEncadreur() != null ? intern.getEncadreur().getId() : null)
-                .school(intern.getSchool())
-                .department(intern.getDepartment())
-                .startDate(intern.getStartDate())
-                .endDate(intern.getEndDate())
-                .status(intern.getStatus().name())
-                .build();
-    }
 }
