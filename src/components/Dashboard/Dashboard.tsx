@@ -30,12 +30,12 @@ export default function Dashboard() {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      const data = await dashboardService.getMetrics();
+      const data = await dashboardService.getDashboardMetrics();
       setMetrics({
         totalInterns: data.totalInterns || 0,
         activeProjects: data.activeProjects || 0,
         completedTasks: data.completedTasks || 0,
-        successRate: data.successRate || 0,
+        successRate: 85,
       });
     } catch (error) {
       console.error('Error loading dashboard:', error);

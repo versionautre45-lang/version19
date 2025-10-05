@@ -138,12 +138,14 @@ export default function Interns() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredInterns.map((intern) => {
             const progress = getProgressPercentage(intern.startDate, intern.endDate);
+            const prenomInitial = intern.prenom && intern.prenom.length > 0 ? intern.prenom[0].toUpperCase() : 'S';
+            const nomInitial = intern.nom && intern.nom.length > 0 ? intern.nom[0].toUpperCase() : 'T';
             return (
               <div key={intern.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 hover:shadow-md transition-shadow duration-200">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center space-x-3">
                     <div className="h-12 w-12 rounded-full bg-gradient-to-br from-orange-400 to-red-400 flex items-center justify-center text-white font-semibold">
-                      {intern.prenom[0]}{intern.nom[0]}
+                      {prenomInitial}{nomInitial}
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900 dark:text-white">{intern.prenom} {intern.nom}</h3>

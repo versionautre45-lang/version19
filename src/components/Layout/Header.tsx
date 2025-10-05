@@ -21,8 +21,10 @@ export default function Header() {
 
   const loadNotifications = async () => {
     try {
-      const data = await notificationService.getNotifications();
-      setNotifications(data);
+      if (authUser?.id) {
+        const data = await notificationService.getUserNotifications(authUser.id);
+        setNotifications(data);
+      }
     } catch (error) {
       console.error('Error loading notifications:', error);
     }
