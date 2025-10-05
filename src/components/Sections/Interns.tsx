@@ -33,7 +33,8 @@ export default function Interns() {
         const storedUser = localStorage.getItem('auth_user');
         if (storedUser) {
           const userData = JSON.parse(storedUser);
-          internsData = await internService.getAllInterns({ encadreurUserId: userData.id });
+          const encadreur = await encadreurService.getEncadreurByUserId(userData.id);
+          internsData = await encadreurService.getEncadreurInterns(encadreur.id);
         } else {
           internsData = [];
         }

@@ -29,6 +29,10 @@ export const encadreurService = {
     return apiService.get<EncadreurDTO>(`/encadreurs/${id}`);
   },
 
+  async getEncadreurByUserId(userId: number): Promise<EncadreurDTO> {
+    return apiService.get<EncadreurDTO>(`/encadreurs/by-user/${userId}`);
+  },
+
   async getEncadreurInterns(id: number): Promise<InternDTO[]> {
     return apiService.get<InternDTO[]>(`/encadreurs/${id}/interns`);
   },

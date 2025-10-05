@@ -44,6 +44,14 @@ public class EncadreurService {
     }
 
     @Transactional(readOnly = true)
+    public UserDTO getEncadreurByUserId(Long userId) {
+        Encadreur encadreur = encadreurRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("ENCADREUR_NOT_FOUND"));
+
+        return convertToDTOWithEncadreurId(encadreur.getUser(), encadreur.getId());
+    }
+
+    @Transactional(readOnly = true)
     public List<InternDTO> getEncadreurInterns(Long encadreurId) {
         List<Intern> interns = internRepository.findByEncadreurId(encadreurId);
         return interns.stream()
@@ -129,10 +137,30 @@ public class EncadreurService {
     }
 
     private UserDTO convertToDTO(User user) {
-        Long internCount = getEncadreurInternCount(user.getId());
+        Encadreur encadreur = encadreurRepository.findByUserId(user.getId()).orElse(null);
+        Long encadreurId = encadreur != null ? encadreur.getId() : null;
+        Long internCount = encadreurId != null ? (long) internRepository.findByEncadreurId(encadreurId).size() : 0L;
 
         return UserDTO.builder()
                 .id(user.getId())
+                .email(user.getEmail())
+                .nom(user.getNom())
+                .prenom(user.getPrenom())
+                .department(user.getDepartment())
+                .phone(user.getPhone())
+                .role(user.getRole().name())
+                .accountStatus(user.getAccountStatus().name())
+                .internCount(internCount)
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .build();
+    }
+
+    private UserDTO convertToDTOWithEncadreurId(User user, Long encadreurId) {
+        Long internCount = encadreurId != null ? (long) internRepository.findByEncadreurId(encadreurId).size() : 0L;
+
+        return UserDTO.builder()
+                .id(encadreurId)
                 .email(user.getEmail())
                 .nom(user.getNom())
                 .prenom(user.getPrenom())

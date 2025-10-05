@@ -34,6 +34,16 @@ public class EncadreurController {
         }
     }
 
+    @GetMapping("/by-user/{userId}")
+    public ResponseEntity<ApiResponse<UserDTO>> getEncadreurByUserId(@PathVariable Long userId) {
+        try {
+            UserDTO encadreur = encadreurService.getEncadreurByUserId(userId);
+            return ResponseEntity.ok(ApiResponse.success(encadreur));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error(e.getMessage()));
+        }
+    }
+
     @GetMapping("/{id}/interns")
     public ResponseEntity<ApiResponse<List<InternDTO>>> getEncadreurInterns(@PathVariable Long id) {
         try {
