@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Calendar, Mail, Building, TrendingUp, Award, GraduationCap, Phone, User, Edit2 } from 'lucide-react';
+import { X, Calendar, Mail, Building, TrendingUp, Award, GraduationCap, Phone, User, CreditCard as Edit2 } from 'lucide-react';
 import { InternDTO, internService, UpdateInternRequest } from '../../services/internService';
 import { encadreurService } from '../../services/encadreurService';
 import { useApiError } from '../../hooks/useApiError';
