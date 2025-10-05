@@ -5,7 +5,11 @@ import SearchModal from '../Modals/SearchModal';
 import { useAuth } from '../../contexts/AuthContext';
 import { notificationService } from '../../services/notificationService';
 
-export default function Header() {
+interface HeaderProps {
+  onNavigate?: (section: string) => void;
+}
+
+export default function Header({ onNavigate }: HeaderProps = {}) {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
@@ -30,11 +34,15 @@ export default function Header() {
     }
   };
 
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-    } catch (error) {
-      console.error('Error signing out:', error);
+  const handleSignOut = () => {
+    setShowProfile(false);
+    signOut();
+  };
+
+  const handleProfileClick = () => {
+    setShowProfile(false);
+    if (onNavigate) {
+      onNavigate('settings');
     }
   };
 
@@ -191,10 +199,7 @@ export default function Header() {
               <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-30">
                 <div className="py-1">
                   <button
-                    onClick={() => {
-                      setShowProfile(false);
-                      window.dispatchEvent(new CustomEvent('navigate', { detail: 'settings' }));
-                    }}
+                    onClick={handleProfileClick}
                     className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
                   >
                     <User className="h-4 w-4" />
@@ -202,10 +207,7 @@ export default function Header() {
                   </button>
                   <hr className="my-1 border-gray-200 dark:border-gray-700" />
                   <button
-                    onClick={() => {
-                      setShowProfile(false);
-                      handleSignOut();
-                    }}
+                    onClick={handleSignOut}
                     className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
                   >
                     <LogOut className="h-4 w-4" />

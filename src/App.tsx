@@ -96,7 +96,7 @@ function AppContent() {
         onSectionChange={setActiveSection}
       />
 
-      <Header />
+      <Header onNavigate={setActiveSection} />
 
       <main className="pt-20 md:pt-24 px-4 md:px-6 pb-6 ml-0 md:ml-64">
         {renderContent()}
